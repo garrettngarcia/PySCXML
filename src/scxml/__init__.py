@@ -3,4 +3,5 @@ class NullHandler(logging.Handler):
     def emit(self, record):
         pass
 logger = logging.getLogger("pyscxml")
-logger.addHandler(NullHandler())
+#logger.addHandler(NullHandler())
+logging.basicConfig(level=logging.DEBUG)

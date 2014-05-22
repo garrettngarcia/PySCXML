@@ -105,7 +105,7 @@ class StateMachine(object):
         self.doc = self.compiler.parseXML(self._open_document(source), self.interpreter)
         self.interpreter.dm = self.doc.datamodel
         self.datamodel = self.doc.datamodel
-        self.doc.datamodel["_x"] = {"self" : self}
+        self.doc.datamodel["_x"] = {"self": self}
         self.doc.datamodel.self = self
         self.doc.datamodel["_sessionid"] = self.sessionid 
         self.doc.datamodel.sessionid = self.sessionid 
@@ -113,7 +113,7 @@ class StateMachine(object):
         self.is_response = self.compiler.is_response
         if setup_session:
             MultiSession().make_session(self.sessionid, self)
-        
+
     
     def _open_document(self, uri):
         if hasattr(uri, "read"):
@@ -385,58 +385,5 @@ if __name__ == "__main__":
         sm = StateMachine(sys.argv[1])
         sm.start()
         sys.exit()
-    
-    '''
-    test411.scxml
-test413.scxml
-test467.scxml
-'''
-    
-    xml = '''
-    <scxml xmlns="http://www.w3.org/2005/07/scxml">
-    
-    <parallel>
-        
-        <state id="A">
-            <onentry>
-                <send event="switch" delay="2s"/>
-            </onentry>
-        </state>
-                
-        <state id="B">
-            <onentry>
-                <log expr="'Entered B.'"/>
-            </onentry>
-            <onexit>
-                <log expr="'Exited B.'"/>
-            </onexit>
-            <state id="B1">
-                <onentry>
-                    <log expr="'Entered B1.'"/>
-                </onentry>
-                <transition event="switch" target="B2"/>
-            </state>
-            <state id="B2">
-                <onentry>
-                    <log expr="'Enterd B2.'"/>
-                </onentry>
-                <transition event="switch" target="B1"/>
-            </state>
-        </state>
-
-    </parallel>
-  
-</scxml>
-    '''
-#    dispatcher.connect(default_logfunction, "invoke_log")
-#    sm = StateMachine("new_xpath_tests/failed/test152.scxml")
-#    sm = StateMachine("xpath_test.xml")
-    sm = StateMachine("assertions_ecmascript/test242.scxml")
-#    sm = StateMachine("exit_issue.xml")
-#    sm = StateMachine(xml)
-#    sm = StateMachine("inline_data.xml")
-#    os.environ["PYSCXMLPATH"] += ":" + sm.filedir
-#    sm = StateMachine("assertions_ecmascript/test154.scxml")
-    sm.start()
 
 
