@@ -598,7 +598,8 @@ class Compiler(object):
     
     def parseXML(self, xmlStr, interpreterRef):
         self.interpreter = interpreterRef
-        xmlStr = self.addDefaultNamespace(xmlStr)
+        #Namespace is required now (3.2.1)
+        #xmlStr = self.addDefaultNamespace(xmlStr)
         try:
             tree = self.xml_from_string(xmlStr)
         except ExpatError:
@@ -887,14 +888,16 @@ class Compiler(object):
             return None # leaf nodes have no initial 
     
     def setDatamodel(self, tree):
+        #return iterator over data tags that aren't within content blocks
         def iterdata():
             return (x for x in iterMain(tree) if x.tag == prepend_ns("data"))
-         
+
+        #initial each data element to None
         for data in iterdata():
             self.dm[data.get("id")] = None
-        
+
+        #set top-level datamodel element
         top_level = tree.find(prepend_ns("datamodel"))
-        # set top-level datamodel element
         if top_level is not None:
             try:
                 self.setDataList(top_level)
@@ -902,9 +905,9 @@ class Compiler(object):
                 self.raiseError("error.execution", e)
 #                raise ParseError("Parsing of data tag caused document startup to fail. \n%s" % e)
             
-            
         if self.doc.binding == "early":
             try:
+                #TODO: When would this happen?
                 top_level = top_level if top_level is not None else []
                 # filtering out the top-level data elements
                 self.setDataList([data for data in iterdata() if data not in top_level])
@@ -914,22 +917,27 @@ class Compiler(object):
         for key, value in self.initData.items():
             if key in self.dm: self.dm[key] = value
             
-    
+    #Sets the data element values in the data model
     def setDataList(self, datalist):
-        
+        #Holds the downloaded contents of the src tags
         dl_mapping = self.parallelize_download(filter(lambda x: x.get("src"), datalist))
         for node in datalist:
             key = node.get("id")
             value = None
             
             if node.get("src"):
+                #TODO: Respect the datamodel here.  This assumes we're using XPATH.
                 try:
                     node.append(etree.fromstring(dl_mapping[node]))
                 except:
                     node.text = dl_mapping[node]
-                    
+
+                #TODO: Fix this.  Value will always be None here. Should be the following I think:
+                #if isinstance(dl_mapping[node], Exception):
+                #    self.logger.error("Data src not found: '%s'. \n\t%s" % (node.get("src"), dl_mapping[node]))
                 if isinstance(value, Exception):
-                    self.logger.error("Data src not found : '%s'. \n\t%s" % (node.get("src"), value))
+                    self.logger.error("Data src not found: '%s'. \n\t%s" % (node.get("src"), value))
+
             if node.get("expr") or len(node) > 0 or node.text:
                 try:
                     value = self.parseContent(node)
@@ -942,18 +950,20 @@ class Compiler(object):
 #            if not self.dm.get(key): self.dm[key] = value
 #            self.dm.setdefault(key, value)
             self.dm[key] = value
-            
+
+    #downloads the src attribue for each node in nodelist, returns dict of node->content pairs
     def parallelize_download(self, nodelist):
         def download(node):
             src = node.get("src")
+            #TODO: I don't think this is in the spec.  The file: prefix shouldn't be needed
             if src.startswith("file:"):
                 src, search_path = get_path(node.get("src").replace("file:", ""))
                 if not src:
                     return (node, URLError("File not found: %s" % node.get("src")))
                 src = "file:" + src
+
             try:
                 return (node, urlopen(src).read())
-                
             except Exception, e:
                 return (node, e)
         

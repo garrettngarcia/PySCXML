@@ -144,6 +144,7 @@ class PythonDataModel(dict, ImperativeDataModel):
     
     @exceptionFormatter
     def evalExpr(self, expr):
+
         return eval(expr, self)
     @exceptionFormatter
     def execExpr(self, expr):
@@ -238,9 +239,10 @@ class ECMAScriptDataModel(ImperativeDataModel):
                 ret = c.eval(expr)
             except Exception, e:
                 raise ExprEvalError(e, [])
-#            TODO: this causes variabels typeof == 'undefined' to become null instead. 
+#           TODO: this causes variables typeof == 'undefined' to become null instead.
             for key in c.locals.keys(): setattr(self.g, key, c.locals[key])
             return ret
+
     def execExpr(self, expr):
         self.evalExpr(expr)
 

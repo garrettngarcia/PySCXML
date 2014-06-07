@@ -58,7 +58,7 @@ class UrlGetter(urllib2.HTTPDefaultErrorHandler):
 #        result.status = code                                  
 #        return result        
 
-
+#Search locally for local_path in cwd and PYSCXMLPATH locations, test to ensure file exists
 def get_path(local_path, additional_paths=""):
         prefix = additional_paths + ":" if additional_paths else ""
         search_path = (prefix + os.getcwd() + ":" + os.environ.get("PYSCXMLPATH", "").strip(":")).split(":")
