@@ -929,13 +929,10 @@ class Compiler(object):
                 try:
                     node.append(etree.fromstring(dl_mapping[node]))
                 except:
-                    node.text = dl_mapping[node]
-
-                #TODO: Fix this.  Value will always be None here. Should be the following I think:
-                #if isinstance(dl_mapping[node], Exception):
-                #    self.logger.error("Data src not found: '%s'. \n\t%s" % (node.get("src"), dl_mapping[node]))
-                if isinstance(value, Exception):
-                    self.logger.error("Data src not found: '%s'. \n\t%s" % (node.get("src"), value))
+                    if isinstance(dl_mapping[node], Exception):
+                        self.logger.error("Data src not found: '%s'. \n\t%s" % (node.get("src"), dl_mapping[node]))
+                    else:
+                        node.text = dl_mapping[node]
 
             if node.get("expr") or len(node) > 0 or node.text:
                 try:
