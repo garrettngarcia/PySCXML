@@ -926,7 +926,6 @@ class Compiler(object):
             value = None
             
             if node.get("src"):
-                #TODO: Respect the datamodel here.  This assumes we're using XPATH.
                 try:
                     node.append(etree.fromstring(dl_mapping[node]))
                 except:

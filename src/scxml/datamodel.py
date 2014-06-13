@@ -217,6 +217,8 @@ class ECMAScriptDataModel(ImperativeDataModel):
         if contentNode != None:
             if contentNode.get("expr"):
                 output = self.evalExpr("(%s)" % contentNode.get("expr"))
+            elif contentNode.text:
+                output = self.evalExpr("(%s)" % contentNode.text)
 #            elif len(contentNode) == 0:
 #                output = self.normalizeContent(contentNode)
 #            elif len(contentNode) == 1:
